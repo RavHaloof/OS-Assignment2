@@ -6,6 +6,8 @@
 
 #define NUM_GLADIATORS 4
 
+// NOTE THAT IN ORDER TO RUN THE TOURNAMENT, YOU NEED TO PROVIDE 4 FILES NAMED G1, G2, G3, G4 WHICH WILL INCLUDE
+// THE GLADIATOR'S STATS (HEALTH, ATTACK) AND THEIR ATTACK ORDER (FOR EXAMPLE: 1, 2, 3) IN THIS ORDER
 int main(int argc, char *argv[]) {
 
     // Setting up gladiator names, file names (stats for the gladiators), their respective PIDS, and an array
