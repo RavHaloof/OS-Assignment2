@@ -17,20 +17,20 @@ int main(int argc, char *argv[]) {
 
     // In case the args count is not correct, exit the program
     if (argc != 2) {
-        printf("wrong args count inserted!");
-        printf("usage: ./gladiator <stat_file>");
+        printf("wrong args count inserted!\n");
+        printf("usage: ./gladiator <stat_file>\n");
         exit(1);
     }
     // Opening our given file, and setting the flag to only read it
     int fd = open(argv[1], O_RDONLY);
     if (fd < 0) {
-        printf("Opening the file %s failed! exiting...", argv[1]);
+        printf("Opening the file %s failed! exiting...\n", argv[1]);
         exit(1);
     }
 
     // Setting up variables for the gladiator
     int health;
-    char opponent_name[OPPONENT_COUNT][MAX_NAME];
+    int opponent_name[OPPONENT_COUNT];
     int opponent_attack[OPPONENT_COUNT], file_nums[FILE_VARIABLES];
     pid_t pid;
     char buffer[BUFFER_SIZE];
@@ -63,19 +63,19 @@ int main(int argc, char *argv[]) {
         // Order array
         switch (file_nums[i + GLADIATOR_STATS]) {
             case 1:
-                strcpy(opponent_name[i], "Maximus");
+                opponent_name[i] = 1;
                 fileName = "G1.txt";
                 break;
             case 2:
-                strcpy(opponent_name[i], "Lucius");
+                opponent_name[i] = 2;
                 fileName = "G2.txt";
                 break;
             case 3:
-                strcpy(opponent_name[i], "Commodus");
+                opponent_name[i] = 3;
                 fileName = "G3.txt";
                 break;
             case 4:
-                strcpy(opponent_name[i], "Spartacus");
+                opponent_name[i] = 4;
                 fileName = "G4.txt";
                 break;
         }
@@ -99,31 +99,35 @@ int main(int argc, char *argv[]) {
         // Closing the file since we're done reading it
         close(fd);
     }
-    
+    /*
     for (int i = 0; i < FILE_VARIABLES; ++i) {
         printf("From file: %s, stats: %d\n", argv[1], file_nums[i]);
     }
     for (int i = 0; i < OPPONENT_COUNT; ++i) {
         printf("From file: %s, opponent name: %s, opponent attack: %d\n", argv[1], opponent_name[i], opponent_attack[i]);
     }
+    */
+    // Saving the file log name
+    char* fileLog = strtok(argv[1], ".");
+    strcat(fileLog, "_log.txt");
 
-    //
-    // Open the log file in append mode
-    /*
+    // Opening the file (creating it if it doesn't exist) and setting it to append mode
+    FILE *logFile = fopen(fileLog, "a");
+    fprintf(logFile, "Gladiator process started. PID: %d\n", getpid());
+    int i = 0;
+    // Open the log file in append mode and document the epic events of the battle until the gladiator dies
     while (health > 0) {
-        FILE *logFile = fopen("gladiator_log.txt", "a");
-        for (int i = 0; i < 3; i++) {
-            fprintf(logFile, "Facing opponent %d... Taking %d damage\n", opponent_name[i], opponent_attack[i]);
-            health -= opponent_attack[i];
-            if (health > 0) {
-                fprintf(logFile, "Are you not entertained? Remaining health: %d\n", health);
-            } else {
-                fprintf(logFile, "The gladiator has fallen... Final health: %d\n", health);
-                break;
-            }
+        fprintf(logFile, "Facing opponent %d... Taking %d damage\n", opponent_name[i], opponent_attack[i]);
+        health -= opponent_attack[i];
+        if (health > 0) {
+            fprintf(logFile, "Are you not entertained? Remaining health: %d\n", health);
+        } else {
+            fprintf(logFile, "The gladiator has fallen... Final health: %d\n", health);
+            break;
         }
+        i = (i + 1) % 3;
     }
-     */
+    fclose(logFile);
     return 0;
 
 }
