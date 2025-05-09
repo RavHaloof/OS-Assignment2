@@ -11,7 +11,6 @@
 #define OPPONENT_COUNT 3
 #define FILE_VARIABLES 5
 #define GLADIATOR_STATS 2
-#define MAX_NAME 10
 
 int main(int argc, char *argv[]) {
 
@@ -79,6 +78,7 @@ int main(int argc, char *argv[]) {
                 fileName = "G4.txt";
                 break;
         }
+        // Saving the fd, and in case we failed to open it, exiting
         fd = open(fileName, O_RDONLY);
         if (fd < 0) {
             printf("Opening the file %s failed! exiting...", argv[1]);
@@ -99,14 +99,7 @@ int main(int argc, char *argv[]) {
         // Closing the file since we're done reading it
         close(fd);
     }
-    /*
-    for (int i = 0; i < FILE_VARIABLES; ++i) {
-        printf("From file: %s, stats: %d\n", argv[1], file_nums[i]);
-    }
-    for (int i = 0; i < OPPONENT_COUNT; ++i) {
-        printf("From file: %s, opponent name: %s, opponent attack: %d\n", argv[1], opponent_name[i], opponent_attack[i]);
-    }
-    */
+
     // Saving the file log name
     char* fileLog = strtok(argv[1], ".");
     strcat(fileLog, "_log.txt");
@@ -128,6 +121,7 @@ int main(int argc, char *argv[]) {
         }
         i = (i + 1) % 3;
     }
+    // Closing the file now that we've finished writing in it
     fclose(logFile);
     return 0;
 
