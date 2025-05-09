@@ -7,6 +7,21 @@
 #include <fcntl.h>
 #include <string.h>
 
+// Function which will read the file
+void readFile() {
+
+}
+
+// Function which will write into the file
+void writeFile() {
+
+}
+
+// Function which will quit
+void quit() {
+
+}
+
 int main(int argc, char *argv[]) {
 
     // In case the args count is not correct, exit the program
