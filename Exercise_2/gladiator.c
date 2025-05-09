@@ -111,7 +111,8 @@ int main(int argc, char *argv[]) {
     char* fileLog = strtok(argv[1], ".");
     strcat(fileLog, "_log.txt");
 
-    // Opening the file (creating it if it doesn't exist) and setting it to append mode
+    // Opening the file (creating it if it doesn't exist, if it does exist, reset it) and setting it to append mode
+    fopen(fileLog, "w");
     FILE *logFile = fopen(fileLog, "a");
     fprintf(logFile, "Gladiator process started. PID: %d\n", getpid());
     int i = 0;
