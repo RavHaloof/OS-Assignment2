@@ -39,7 +39,7 @@ void readFile(FILE **srcFile, FILE **destFile, int startOffset, int endOffset) {
     }
     char read[BUFFER];
     fseek(*srcFile, startOffset, SEEK_SET);
-    for (int i = 0; i < endOffset; ++i) {
+    for (int i = 0; i < endOffset - startOffset; ++i) {
         fscanf(*srcFile, "%c", read);
         fprintf(*destFile, "%s", read);
     }
@@ -66,26 +66,26 @@ int main(int argc, char *argv[]) {
     }
 
     // Checks if the data file exists, and if it does, opens it for reading and writing
-    FILE *data = fopen(argv[1], "r+");
-    if (data == NULL) {
+    FILE *dataFile = fopen(argv[1], "r+");
+    if (dataFile == NULL) {
         perror("data.txt\n");
         exit(1);
     };
     // Checks if the requests file exists, and if it does, opens it for reading
-    FILE *requests = fopen(argv[2], "r");
-    if (requests == NULL) {
+    FILE *requestsFile = fopen(argv[2], "r");
+    if (requestsFile == NULL) {
         perror("requests.txt\n");
         exit(1);
     }
 
-    FILE *results = fopen("read_results.txt", "w");
+    FILE *resultsFile = fopen("read_results.txt", "w");
     char input[BUFFER];
-    int *startOffset, *endOffset;
+    char *startOffset, *endOffset;
     // Main reading through requests file loop
-    while (fscanf(requests, "%s ", input) != EOF) {
-        if (strcmp(input, "R")) {
-            fscanf(requests, "%d %d", startOffset, endOffset);
-            readFile(&data, &results, *startOffset, *endOffset);
+    while (fscanf(requestsFile, "%s ", input) != EOF) {
+        if (strcmp(input, "R") == 0) {
+            fscanf(requestsFile, "%s %s", startOffset, endOffset);
+            readFile(&dataFile, &resultsFile, atoi(startOffset), atoi(endOffset));
         }
     }
 
