@@ -38,8 +38,12 @@ void readFile(FILE **srcFile, FILE **destFile, int startOffset, int endOffset) {
         return;
     }
     char read[BUFFER];
-    fscanf(*srcFile, "%s", read);
-    printf("%s\n", read);
+    fseek(*srcFile, startOffset, SEEK_SET);
+    for (int i = 0; i < endOffset; ++i) {
+        fscanf(*srcFile, "%c", read);
+        fprintf(*destFile, "%s", read);
+    }
+    fprintf(*destFile, "\n");
 }
 
 // Function which will write into the file
@@ -74,10 +78,15 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // Main reading through requests file loop
+    FILE *results = fopen("read_results.txt", "w");
     char input[BUFFER];
+    int *startOffset, *endOffset;
+    // Main reading through requests file loop
     while (fscanf(requests, "%s ", input) != EOF) {
-        printf("%s\n", input);
+        if (strcmp(input, "R")) {
+            fscanf(requests, "%d %d", startOffset, endOffset);
+            readFile(&data, &results, *startOffset, *endOffset);
+        }
     }
 
     printf("hi\n");
