@@ -21,39 +21,75 @@ int checkFileLength(FILE** data) {
 }
 
 // Function which will read the file
-void readFile(FILE **srcFile, FILE **destFile, int startOffset, int endOffset) {
+int readFile(FILE **srcFile, FILE **destFile, int startOffset, int endOffset) {
     //Checking edge cases:
     if (startOffset > endOffset) {
         printf("The start offset is greater than the end offset. why u bully me? :(\n");
-        return;
+        return 0;
     }
+    if (startOffset < 0) {
+        printf("The start offset is lesser than 0. why u bully me? :(\n");
+        return 0;
+    }
+    if (endOffset > checkFileLength(srcFile)) {
+        printf("The end offset is greater than the length of the data file. why u bully me? :(\n");
+        return 0;
+    }
+    // We set the start point to the start offset using fseek
+    char read[BUFFER];
+    fseek(*srcFile, startOffset, SEEK_SET);
+    // We print char by char into the destination file from the start offset to the end offset
+    for (int i = 0; i <= endOffset - startOffset; ++i) {
+        fscanf(*srcFile, "%c", read);
+        fprintf(*destFile, "%c", read[0]);
+    }
+    // Resetting the start point now that we've finished reading
+    fseek(*srcFile, 0, SEEK_SET);
+    return 1;
+}
+
+// Function which will write into the file
+void writeFile(FILE **destFile, int startOffset, char* string) {
+    //Checking edge cases:
     if (startOffset < 0) {
         printf("The start offset is lesser than 0. why u bully me? :(\n");
         return;
     }
-    if (endOffset > checkFileLength(srcFile)) {
-        printf("%d\n", checkFileLength(srcFile));
-        printf("%d\n", endOffset);
+    if (startOffset > checkFileLength(destFile) + 1) {
         printf("The end offset is greater than the length of the data file. why u bully me? :(\n");
         return;
     }
+
+    // Creating a new file where we will store the new data in
+    FILE *data_temp = fopen("data_temp.txt", "w+");
+    // Writing all the data up to the offset point
+    readFile(destFile, &data_temp, 0, startOffset);
+
+    // Printing the string at the offset point
+    fseek(data_temp, startOffset, SEEK_SET);
+    fprintf(data_temp, "%s", string);
+
+    // Printing the rest of the original file into the temp file after the string we just printed into the temp file
+    fseek(data_temp, startOffset + strlen(string), SEEK_SET);
+    readFile(destFile, &data_temp, startOffset, checkFileLength(destFile) - 1);
+
+    // We return the pointers back to the beginning of each file for the final copy
+    fseek(*destFile, 0, SEEK_SET);
+    fseek(data_temp, 0, SEEK_SET);
+
+    // Now we copy back the data from the temporary file into the destination file
     char read[BUFFER];
-    fseek(*srcFile, startOffset, SEEK_SET);
-    for (int i = 0; i < endOffset - startOffset; ++i) {
-        fscanf(*srcFile, "%c", read);
-        fprintf(*destFile, "%s", read);
-    }
-    fprintf(*destFile, "\n");
-}
+    fscanf(data_temp, "%s", read);
+    fprintf(*destFile, "%s", read);
 
-// Function which will write into the file
-void writeFile() {
-
+    // We delete the temporary file, since we have no more use for it
+    fclose(data_temp);
+    remove("data_temp.txt");
 }
 
 // Function which will quit
 void quit() {
-
+    exit(0);
 }
 
 int main(int argc, char *argv[]) {
@@ -80,14 +116,32 @@ int main(int argc, char *argv[]) {
 
     FILE *resultsFile = fopen("read_results.txt", "w");
     char input[BUFFER];
-    char *startOffset, *endOffset;
+    char var1[BUFFER];
+    char var2[BUFFER];
     // Main reading through requests file loop
     while (fscanf(requestsFile, "%s ", input) != EOF) {
+        // In case the user requested to read
         if (strcmp(input, "R") == 0) {
-            fscanf(requestsFile, "%s %s", startOffset, endOffset);
-            readFile(&dataFile, &resultsFile, atoi(startOffset), atoi(endOffset));
+            fscanf(requestsFile, "%s %s", var1, var2);
+            if (readFile(&dataFile, &resultsFile, atoi(var1), atoi(var2))) {
+                // Then we go down a line
+                fprintf(resultsFile, "\n");
+            }
+        }
+        // In case the user requested to write
+        else if (strcmp(input, "W") == 0) {
+            fscanf(requestsFile, "%s %s", var1, var2);
+            writeFile(&dataFile, atoi(var1), var2);
+        }
+        // In case the user requested to quit
+        else if (strcmp(input, "Q") == 0) {
+            quit();
+        }
+        // Otherwise (invalid command)
+        else {
+            printf("invalid request!\n");
         }
     }
 
-    printf("hi\n");
+    printf("run finished!\n");
 }
