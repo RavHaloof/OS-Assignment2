@@ -142,6 +142,8 @@ int main(int argc, char *argv[]) {
             printf("invalid request!\n");
         }
     }
-
+    fclose(dataFile);
+    fclose(requestsFile);
+    fclose(resultsFile);
     printf("run finished!\n");
 }
